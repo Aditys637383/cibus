@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weekly Meal Variety Planner</title>
+  <!-- SEO & Meta Tags -->
+  <meta name="description" content="Plan a diverse weekly menu, prevent repeating dishes, and receive morning cooking reminders. Incredibly simple, clean, and accessible.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <!-- Toast System for Micro-interactions -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-logo">
+        <span class="logo-icon">🍳</span>
+        <div>
+          <h1>Meally</h1>
+          <p class="subtitle">Simplified Meal Variety Planner</p>
+        </div>
+      </div>
+      <div class="header-date" id="current-date-badge"></div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="app-nav">
+      <button class="nav-btn active" id="tab-planner" onclick="switchTab('planner')">
+        <span class="nav-icon">📅</span>
+        <span class="nav-text">Planner</span>
+      </button>
+      <button class="nav-btn" id="tab-bank" onclick="switchTab('bank')">
+        <span class="nav-icon">💡</span>
+        <span class="nav-text">Idea Bank</span>
+      </button>
+      <button class="nav-btn" id="tab-settings" onclick="switchTab('settings')">
+        <span class="nav-icon">⚙️</span>
+        <span class="nav-text">Settings</span>
+      </button>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="app-content">
+      
+      <!-- VIEW: Planner -->
+      <section id="view-planner" class="view-section active">
+        <!-- Quick Actions Panel -->
+        <div class="quick-actions">
+          <button class="btn btn-primary btn-large btn-sparkle" id="btn-randomizer">
+            <span class="btn-icon">✨</span> Give Me an Idea
+          </button>
+          <button class="btn btn-secondary btn-large" id="btn-clear-week">
+            <span class="btn-icon">🔄</span> Clear Week
+          </button>
+        </div>
+
+        <!-- 7-Day Grid -->
+        <div class="meal-grid" id="meal-grid">
+          <!-- Dynamically populated from app.js -->
+        </div>
+      </section>
+
+      <!-- VIEW: Idea Bank -->
+      <section id="view-bank" class="view-section">
+        <div class="card bank-add-card">
+          <h2>Add New Dish</h2>
+          <form id="add-dish-form" class="add-dish-form">
+            <input type="text" id="new-dish-input" placeholder="e.g., Creamy Garlic Salmon" required aria-label="New dish name">
+            <button type="submit" class="btn btn-primary">Add Dish</button>
+          </form>
+        </div>
+
+        <div class="card bank-list-card">
+          <div class="bank-list-header">
+            <h2>Your Go-To Dishes</h2>
+            <span class="badge" id="dish-count">0 dishes</span>
+          </div>
+          <div class="bank-empty-state" id="bank-empty">
+            <p>No dishes saved yet. Add your favorites above to build your custom Idea Bank!</p>
+          </div>
+          <ul class="dish-list" id="dish-list">
+            <!-- Dynamically populated -->
+          </ul>
+        </div>
+      </section>
+
+      <!-- VIEW: Settings -->
+      <section id="view-settings" class="view-section">
+        <div class="card settings-card">
+          <h2>Notifications & Reminders</h2>
+          <p class="settings-desc">Receive a helpful alert reminding you what to cook for the day.</p>
+
+          <div class="settings-row">
+            <div class="settings-info">
+              <label for="toggle-notifications" class="settings-label">Enable Cooking Reminders</label>
+              <p class="settings-subdesc">Delivers a morning update directly to your device.</p>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggle-notifications">
+              <span class="slider round"></span>
+            </label>
+          </div>
+
+          <div class="settings-row disabled-row" id="time-setting-row">
+            <div class="settings-info">
+              <label for="reminder-time" class="settings-label">Notification Time</label>
+              <p class="settings-subdesc">Choose when you want to receive your daily recipe alert.</p>
+            </div>
+            <input type="time" id="reminder-time" value="08:00">
+          </div>
+
+          <div class="settings-row text-center">
+            <button class="btn btn-primary w-full" id="btn-simulate-notification">
+              🔔 Test Morning Alert Now
+            </button>
+          </div>
+        </div>
+
+        <div class="card settings-card">
+          <h2>Reset App Data</h2>
+          <p class="settings-desc">Completely clear your schedule and your custom Idea Bank back to defaults.</p>
+          <button class="btn btn-danger w-full" id="btn-factory-reset">
+            💥 Factory Reset App
+          </button>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Randomizer Success Dialog Modal -->
+  <div class="modal-overlay" id="randomizer-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <span class="modal-sparkle">✨</span>
+        <h3>Chef's Suggestion</h3>
+      </div>
+      <div class="modal-body">
+        <p class="modal-suggestion-label">How about preparing:</p>
+        <h2 id="suggested-dish-name">Tacos</h2>
+        <div class="form-group">
+          <label for="assign-day-select" class="settings-label">Assign this to:</label>
+          <select id="assign-day-select" class="styled-select">
+            <!-- Dynamically populated with empty days -->
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" id="btn-confirm-suggestion">Assign to Day</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
